@@ -5,6 +5,28 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ .Values.component }}
 spec:
+  serviceAccountName: {{ .Values.component }}
   containers:
-    - name: { { .Values.component } }
-      image: 206243364202.dkr.ecr.us-east-1.amazonaws.com/{{ .Values.component }}:{{ .Values.APP_VERSION }}      #AwsECR repository name latest
+  - name: { { .Values.component } }
+    image: 206243364202.dkr.ecr.us-east-1.amazonaws.com/{{ .Values.component }}:{{ .Values.APP_VERSION }}      #AwsECR repository name latest
+    volumeMounts:
+      - mountPath: /common
+        name: common
+  initContainers:
+  - name: roboshop-aws-ps-init-container
+    image: 206243364202.dkr.ecr.us-east-1.amazonaws.com/roboshop-aws-ps-init-container:2.0.0      #AwsECR init-container repository name latest and tag number
+    env:
+      - name: PARAMETERS
+        value: {{ .Values.PARAMETERS }}
+    imagePullPolicy: Always
+    volumeMounts:
+    - mountPath: /common
+      name: common
+  volumes:
+  - name: common
+    emptyDir:
+      sizeLimit: 5Mi
+
+
+
+
