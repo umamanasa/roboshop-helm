@@ -3,15 +3,13 @@ kind: Service
 metadata:
   name: {{ .Values.component }}
   labels:
-    app.kubernetes.io/name: {{ .Values.component }}
-  annotations:
-    helm.sh/hook: pre-install
-    helm.sh/hook-delete-policy: before-hook-creation
-    helm.sh/hook-weight: "-10"
+    {{- include "roboshop.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service_type }}
-  selector:
-    app.kubernetes.io/name: {{ .Values.component }}
+  type: {{ .Values.service.type }}
   ports:
-    - port: 80
+    - port: {{ .Values.service.port }}
       targetPort: {{ .Values.port }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "roboshop.selectorLabels" . | nindent 4 }}
